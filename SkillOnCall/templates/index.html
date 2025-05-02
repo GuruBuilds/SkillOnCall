@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    SkillOnCall
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>SkillOnCall</h1>
+        <p>Welcome to SkillOnCall, your one-stop solution for all your service needs. Whether you're looking for a plumber, electrician, or any other service provider, we've got you covered.</p>
+        <p>Sign up now to get started!</p>
+        <a href="{% url 'signup_view' %}" class="btn btn-primary">Sign Up</a>
+    </div>
+{% endblock %}

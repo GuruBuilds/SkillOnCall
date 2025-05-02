@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Sign Up</h1>
+    <form method="post" action="{% url 'signup_view' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Email address</label>
+            <input type="email" class="form-control" name="email" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" name="Confirmpassword">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" name="username">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" name="city">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" name="address"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">User Type</label>
+            <select class="form-select" name="user_type">
+                <option value="customer" selected>Customer</option>
+                <option value="provider">Service Provider</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="number" class="form-control" name="phone_number">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Service provided</label>
+            <select class="form-select" name="services_offered">
+                <option selected>Choose...</option>
+                {% for service in services %}
+                    <option value="{{ service.id }}">{{ service }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Experience</label>
+            <input class="form-control" name="experience"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tell About you self</label>
+            <textarea class="form-control" name="description"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Charge Per Hour</label>
+            <input class="form-control" name="charge_per_hour"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
