@@ -1,9 +1,34 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Customer, ServiceProvider, Service
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import authenticate, login,  logout
+from django.contrib import messages
+from home.views import index
 
 # Create your views here.
+
+def sign_in(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if username and password:
+            # Authenticate user
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                messages.success(request, f"Welcome back, {username}!")
+                return redirect(index)
+            else:
+                # Invalid login
+                messages.error(request, "Invalid username or password.")
+
+        else:
+            messages.error(request, "Please enter both username and password.")
+        return render(request, 'accounts/login.html')
+    else:
+        return render(request, 'accounts/login.html')
+
 def signup_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -30,4 +55,9 @@ def signup_view(request):
     else:
         services = Service.objects.all()
         return render(request, 'accounts/signup_view.html', {'services': services})
+
+def sign_out(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect(index)
     
