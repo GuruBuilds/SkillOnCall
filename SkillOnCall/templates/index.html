@@ -6,9 +6,41 @@
 
 {% block content %}
     <div class="container">
-        <h1>SkillOnCall</h1>
-        <p>Welcome to SkillOnCall, your one-stop solution for all your service needs. Whether you're looking for a plumber, electrician, or any other service provider, we've got you covered.</p>
-        <p>Sign up now to get started!</p>
-        <a href="{% url 'signup_view' %}" class="btn btn-primary">Sign Up</a>
+        {% if user.is_authenticated %}
+            <h2>Welcome, {{ user.username }}!</h2>
+            <p>Explore our services or manage your account.</p>
+        {% else %}
+            <h1>SkillOnCall</h1>
+            <p>Welcome to SkillOnCall, your one-stop solution for all your service needs...</p>
+            <p>Sign up now to get started!</p>
+            <a href="{% url 'signup_view' %}" class="btn btn-primary">Sign Up</a>
+        {% endif %}
+
+        <hr>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0">Top Service Providers</h3>
+            <a href="{% url "all_providers" %}" class="btn btn-outline-secondary">View All Providers</a>
+        </div>
+        <div class="row">
+            {% for provider in four_providers %}
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="card-img-top" alt="Provider Image">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ provider.customer.user.username }}</h5>
+                            {% for service in provider.services_offered.all %}
+                                <span class="badge bg-primary">{{ service.name }}</span>
+                            {% endfor %}
+                            <p class="card-text">{{ provider.description|truncatewords:15 }}</p>
+                            <p><strong>Experience:</strong> {{ provider.experience }} years</p>
+                            <p><strong>Charges:</strong> ₹{{ provider.charge_per_hour }} / hour</p>
+                            <a href="{% url 'provider_detail' provider.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            <a href="" class="btn btn-sm btn-outline-secondary">Hire Me</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

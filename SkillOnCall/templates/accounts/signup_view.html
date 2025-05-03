@@ -1,69 +1,131 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign Up{% endblock %}
+{% block title %}{% if is_edit %}Edit Profile{% else %}Sign Up{% endif %}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Sign Up</h1>
-    <form method="post" action="{% url 'signup_view' %}">
+<div class="container my-5">
+    <h2 class="mb-4">{% if is_edit %}Edit Your Profile{% else %}Create Your Account{% endif %}</h2>
+    <form method="post" class="row g-3">
         {% csrf_token %}
-        <div class="mb-3">
-            <label class="form-label">Email address</label>
-            <input type="email" class="form-control" name="email" aria-describedby="emailHelp">
+        <!-- Basic Info -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" 
+                       value="{{ initial_data.username }}" {% if is_edit %}readonly{% endif %} required>
+                {% if is_edit %}<small class="text-muted">Username cannot be changed</small>{% endif %}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" 
+                       value="{{ initial_data.email }}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" name="password">
+        
+        <!-- Password Fields -->
+        {% if is_edit %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-control" name="password"
+                       placeholder="Leave blank to keep current password">
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" name="Confirmpassword">
+        {% else %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" name="Confirmpassword">
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Username</label>
-            <input type="text" class="form-control" name="username">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">City</label>
-            <input type="text" class="form-control" name="city">
+        {% endif %}
+
+        <!-- Contact Info -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" name="city" value="{{ initial_data.city }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                <input type="text" class="form-control" name="phone_number" value="{{ initial_data.phone_number }}">
+            </div>
         </div>
         <div class="mb-3">
             <label class="form-label">Address</label>
-            <textarea class="form-control" name="address"></textarea>
+            <textarea class="form-control" name="address" rows="2">{{ initial_data.address }}</textarea>
         </div>
         <div class="mb-3">
             <label class="form-label">User Type</label>
-            <select class="form-select" name="user_type">
-                <option value="customer" selected>Customer</option>
-                <option value="provider">Service Provider</option>
+            <select class="form-select" name="user_type" id="userTypeSelect">
+                <option value="customer" {% if initial_data.user_type == 'customer' %}selected{% endif %}>Customer</option>
+                <option value="provider" {% if initial_data.user_type == 'provider' %}selected{% endif %}>Service Provider</option>
             </select>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Phone Number</label>
-            <input type="number" class="form-control" name="phone_number">
+
+        <!-- Provider-Specific Fields -->
+        <div id="providerFields" class="border p-3 rounded bg-light mb-4" 
+             style="display: {% if initial_data.user_type == 'provider' %}block{% else %}none{% endif %};">
+            <h5 class="mb-3">Service Provider Information</h5>
+
+            <div class="mb-3">
+                <label class="form-label">Services Offered</label>
+                <select class="form-select" name="services_offered" multiple>
+                    {% for service in services %}
+                        <option value="{{ service.id }}"
+                            {% if service.id in initial_data.services_offered %}selected{% endif %}>
+                            {{ service.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Hold Ctrl/Cmd to select multiple services</small>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Experience (Years)</label>
+                    <input type="number" class="form-control" name="experience" 
+                           value="{{ initial_data.experience|default:0 }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Charge Per Hour</label>
+                    <input type="number" step="0.01" class="form-control" name="charge_per_hour" 
+                           value="{{ initial_data.charge_per_hour|default:0 }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="description" rows="3">{{ initial_data.description }}</textarea>
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Service provided</label>
-            <select class="form-select" name="services_offered">
-                <option selected>Choose...</option>
-                {% for service in services %}
-                    <option value="{{ service.id }}">{{ service }}</option>
-                {% endfor %}
-            </select>
+
+        <div class="d-flex">
+            <button type="submit" class="btn btn-primary me-2">
+                {% if is_edit %}Update Profile{% else %}Sign Up{% endif %}
+            </button>
+            {% if is_edit %}
+            <a href="{% url 'index' %}" class="btn btn-outline-secondary">Cancel</a>
+            {% endif %}
         </div>
-        <div class="mb-3">
-            <label class="form-label">Experience</label>
-            <input class="form-control" name="experience"/>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Tell About you self</label>
-            <textarea class="form-control" name="description"></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Charge Per Hour</label>
-            <input class="form-control" name="charge_per_hour"/>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const userTypeSelect = document.getElementById('userTypeSelect');
+        const providerFields = document.getElementById('providerFields');
+        
+        function toggleProviderFields() {
+            providerFields.style.display = userTypeSelect.value === 'provider' ? 'block' : 'none';
+        }
+        
+        userTypeSelect.addEventListener('change', toggleProviderFields);
+        toggleProviderFields();
+    });
+</script>
 {% endblock %}
