@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    All Service Providers
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>All Service Providers</h2>
+        <div class="row">
+            {% for provider in all_providers %}
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ provider.customer.user.username }}</h5>
+                            <p class="card-text">{{ provider.description }}</p>
+                            <p><strong>Experience:</strong> {{ provider.experience }} years</p>
+                            <p><strong>Charges:</strong> ₹{{ provider.charge_per_hour }} / hour</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

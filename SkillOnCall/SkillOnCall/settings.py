@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',  # Custom app for user accounts
     'home',
-    'crispy_forms',  # For crispy forms
-    'crispy_bootstrap5',  # For Bootstrap 5 support
+    # 'crispy_forms',  # For crispy forms
+    # 'crispy_bootstrap5',  # For Bootstrap 5 support
 ]
 
 MIDDLEWARE = [
@@ -130,7 +130,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap5'  # or 'bootstrap5' or 'tailwind'
+# CRISPY_TEMPLATE_PACK = 'bootstrap5'  # or 'bootstrap5' or 'tailwind'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'post_list'  # After successful login

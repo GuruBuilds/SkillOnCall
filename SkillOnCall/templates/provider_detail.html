@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ provider.customer.user.username }} - Profile
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ provider.customer.user.username }}</h2>
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Provider Image" class="img-thumbnail mb-3" style="max-width: 200px;">
+    <p><strong>Description:</strong> {{ provider.description }}</p>
+    <p><strong>Experience:</strong> {{ provider.experience }} years</p>
+    <p><strong>Charges:</strong> ₹{{ provider.charge_per_hour }} / hour</p>
+    <p><strong>Services Offered:</strong></p>
+    <ul>
+        {% for service in provider.services_offered.all %}
+            <li>{{ service.name }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
