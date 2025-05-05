@@ -174,4 +174,3 @@ def sign_out(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect(index)
-    

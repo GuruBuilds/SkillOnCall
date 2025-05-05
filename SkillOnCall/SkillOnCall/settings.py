@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',  # Custom app for user accounts
     'home',
+    'booking',
     # 'crispy_forms',  # For crispy forms
     # 'crispy_bootstrap5',  # For Bootstrap 5 support
 ]
@@ -132,5 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CRISPY_TEMPLATE_PACK = 'bootstrap5'  # or 'bootstrap5' or 'tailwind'
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'post_list'  # After successful login
+LOGIN_URL = 'sign_in'
+LOGIN_REDIRECT_URL = 'index'  # After successful login
