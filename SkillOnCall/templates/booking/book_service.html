@@ -1,0 +1,46 @@
+{% extends '../base.html' %}
+
+{% block title %}
+    Create Bookings
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Book a Service with {{ provider }}</h2>
+    <p>Choose the services and provide details about your problem.</p>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        
+        <!-- Service Provider -->
+        <div class="mb-3">
+            <label for="provider" class="form-label">Service Provider</label>
+            <input type="text" class="form-control" id="provider" value="{{ provider }}" disabled/>
+        </div>
+        
+        <!-- Services -->
+        <div class="mb-3">
+            <label for="services" class="form-label">Select Services</label>
+            <select class="form-select" id="services" name="services" multiple>
+                {% for service in provider.services_offered.all %}
+                    <option value="{{ service.id }}">{{ service.name }}</option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">Hold down 'Ctrl' (Windows) or 'Command' (Mac) to select multiple services.</small>
+        </div>
+
+        <div class="mb-3">
+            <input type="datetime-local" class="form-control" name="booking_date" id="booking_date"/>
+        </div>
+
+        <!-- Problem Description -->
+        <div class="mb-3">
+            <label for="problem_description" class="form-label">Description of the Problem</label>
+            <textarea class="form-control" id="problem_description" name="description_of_problem" rows="4" required></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Book Service</button>
+    </form>
+</div>
+{% endblock %}

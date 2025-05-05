@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Explore {{ service.name }} Service
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Explore {{ service.name }} Service</h2>
+
+    <p class="lead text-center">{{ service.description }}</p>
+
+    <hr>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Providers Offering {{ service.name }}</h3>
+    </div>
+
+    {% if providers %}
+        <div class="row">
+            {% for provider in providers %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="card-img-top" alt="Provider Image">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ provider.customer.user.username }}</h5>
+                            <p><strong>Experience:</strong> {{ provider.experience }} years</p>
+                            <p><strong>Charges:</strong> ₹{{ provider.charge_per_hour }} / hour</p>
+                            <p class="card-text">{{ provider.description|truncatewords:15 }}</p>
+                            <a href="{% url 'provider_detail' provider.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                            <a href="{% url 'book_service' provider.id %}" class="btn btn-outline-secondary btn-sm">Hire Me</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            No providers are offering this service at the moment.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
