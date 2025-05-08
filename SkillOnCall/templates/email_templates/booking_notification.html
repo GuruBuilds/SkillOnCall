@@ -81,11 +81,11 @@
                 <p><strong>Customer Name:</strong> {{ customer_name }}</p>
                 <p><strong>Booking Description:</strong> {{ description_of_problem }}</p>
                 <p><strong>Services Requested:</strong></p>
-                {% comment %} <ul>
+                <ul>
                     {% for service in services %}
                         <li>{{ service.name }}</li>
                     {% endfor %}
-                </ul> {% endcomment %}
+                </ul>
             </div>
 
             <p>Please review the booking request and decide whether you want to accept or decline the booking.</p>
