@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'accounts',  # Custom app for user accounts
     'home',
     'booking',
-    # 'crispy_forms',  # For crispy forms
-    # 'crispy_bootstrap5',  # For Bootstrap 5 support
 ]
 
 MIDDLEWARE = [
@@ -131,10 +129,9 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CRISPY_TEMPLATE_PACK = 'bootstrap5'  # or 'bootstrap5' or 'tailwind'
-
+# Login settings
 LOGIN_URL = 'sign_in'
-LOGIN_REDIRECT_URL = 'index'  # After successful login
+LOGIN_REDIRECT_URL = 'index'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
