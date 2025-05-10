@@ -1,7 +1,7 @@
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Booking, Service, ServiceProvider
 from django.utils.timezone import now
@@ -31,7 +31,7 @@ def book_service(request, provider_id):
         # Prepare email content using the HTML template
         subject = "New Service Booking Request"
         base_url = request.build_absolute_uri('/')
-        accept_decline_url = f"{base_url}accept-decline-booking/{booking.id}/"
+        accept_decline_url = f"{base_url}accept-decline-booking/{booking.booking_id}/"
         context = {
             'provider_name': service_provider,
             'customer_name': customer,
@@ -68,3 +68,47 @@ def view_bookings(request):
     bookings = Booking.objects.filter(customer_id=customer)
 
     return render(request, 'booking/all_bookings.html', {'bookings': bookings})
+
+@login_required
+def my_allocation(request):
+    provider = request.user.customer.serviceprovider
+    bookings = Booking.objects.filter(service_provider_id=provider)
+
+    return render(request, 'booking/my_allocation.html', {'bookings': bookings})
+
+@login_required	
+def confirm_booking(request, booking_id):
+    booking = Booking.objects.get(booking_id=booking_id)
+    booking.status = 'Confirmed'
+    booking.save()
+
+    # TODO for Gurupreet: send email to customer after confirmation
+    # Send confirmation email to the customer
+    # subject = "Booking Confirmation"
+    # context = {
+    #     'customer_name': booking.customer_id.user.first_name,
+    #     'service_provider_name': booking.service_provider_id.customer.user.first_name,
+    #     'description_of_problem': booking.description_of_problem,
+    #     'services': booking.service_id.all(),
+    #     'company_name': 'Your Company Name',
+    #     'current_year': now().year,
+    # }
+    # html_message = render_to_string('email_templates/booking_confirmation.html', context)
+    # from_email = settings.EMAIL_HOST_USER
+
+    # try:
+    #     send_mail(subject, '', from_email, [booking.customer_id.user.email], html_message=html_message)
+    # except Exception as e:
+    #     print(f"Error sending confirmation email: {str(e)}")
+
+    return redirect('my_allocation')
+
+@login_required
+def cancel_booking(request, booking_id):
+    booking = Booking.objects.get(booking_id=booking_id)
+    booking.status = 'Cancelled'
+    booking.save()
+
+    # TODO for Gurupreet: send email to customer after cancellation
+
+    return redirect('my_allocation')
