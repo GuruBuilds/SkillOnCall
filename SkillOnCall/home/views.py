@@ -15,6 +15,9 @@ def index(request):
 
 def all_providers(request):
     all_providers = ServiceProvider.objects.all()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        all_providers = all_providers.exclude(customer=customer)
     return render(request, 'all_providers.html', {'all_providers': all_providers})
 
 def provider_detail(request, pk):
