@@ -23,9 +23,11 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'view_bookings' %}">My Bookings</a>
-          </li>
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'view_bookings' %}">My Bookings</a>
+            </li>
+          {% endif %}
           {% if user.is_authenticated and service_provider %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'my_allocation' %}">My Allocation</a>
