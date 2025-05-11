@@ -66,15 +66,23 @@ def book_service(request, provider_id):
 def view_bookings(request):
     customer = request.user.customer
     bookings = Booking.objects.filter(customer_id=customer)
+    pending_bookings = bookings.filter(status='Pending')
+    confirmed_bookings = bookings.filter(status='Confirmed')
+    cancelled_bookings = bookings.filter(status='Cancelled')
+    completed_bookings = bookings.filter(status='Completed')
 
-    return render(request, 'booking/all_bookings.html', {'bookings': bookings})
+    return render(request, 'booking/all_bookings.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
 
 @login_required
 def my_allocation(request):
     provider = request.user.customer.serviceprovider
     bookings = Booking.objects.filter(service_provider_id=provider)
+    pending_bookings = bookings.filter(status='Pending')
+    confirmed_bookings = bookings.filter(status='Confirmed')
+    cancelled_bookings = bookings.filter(status='Cancelled')
+    completed_bookings = bookings.filter(status='Completed')
 
-    return render(request, 'booking/my_allocation.html', {'bookings': bookings})
+    return render(request, 'booking/my_allocation.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
 
 @login_required	
 def confirm_booking(request, booking_id):

@@ -8,6 +8,7 @@ class Booking(models.Model):
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
         ('Cancelled', 'Cancelled'),
+        ('Completed', 'Completed'),
     )
     booking_id = models.AutoField(primary_key=True)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
