@@ -43,13 +43,13 @@ def signup_view(request):
         if request.user.is_authenticated:
             user = request.user
             customer = user.customer
-            
+
             # Update user fields
             user.email = email
             if password:  # Only update password if provided
                 user.set_password(password)
             user.save()
-            
+
             # Update customer fields
             customer.phone_number = phone_number
             customer.address = address
@@ -63,7 +63,7 @@ def signup_view(request):
                 description = request.POST.get('description')
                 charge_per_hour = request.POST.get('charge_per_hour')
                 services = request.POST.getlist('services_offered')
-                
+
                 # Get or create service provider
                 service_provider, created = ServiceProvider.objects.get_or_create(
                     customer=customer,
@@ -73,13 +73,13 @@ def signup_view(request):
                         'charge_per_hour': charge_per_hour
                     }
                 )
-                
+
                 if not created:
                     service_provider.experience = experience
                     service_provider.description = description
                     service_provider.charge_per_hour = charge_per_hour
                     service_provider.save()
-                
+
                 service_provider.services_offered.set(services)
             else:
                 # Remove service provider if user type changed to customer
@@ -87,7 +87,7 @@ def signup_view(request):
 
             messages.success(request, "Profile updated successfully!")
             return redirect('index')
-        
+
         else:
             user = User.objects.create_user(username=username, password=password, email=email)
             customer = Customer.objects.create(
@@ -103,7 +103,7 @@ def signup_view(request):
                 description = request.POST.get('description')
                 charge_per_hour = request.POST.get('charge_per_hour')
                 services = request.POST.getlist('services_offered')
-                
+
                 service_provider = ServiceProvider.objects.create(
                     customer=customer,
                     experience=experience,
@@ -115,11 +115,11 @@ def signup_view(request):
             login(request, user)
             messages.success(request, "Account created successfully!")
             return redirect('index')
-    
+
     # GET request handling
     else:
         services = Service.objects.all()
-        
+
         # If user is authenticated (edit profile case)
         if request.user.is_authenticated:
             user = request.user
@@ -134,7 +134,7 @@ def signup_view(request):
                     city='',
                     user_type='customer'
                 )
-            
+
             # Prepare initial data
             initial_data = {
                 'username': user.username,
@@ -144,7 +144,7 @@ def signup_view(request):
                 'city': customer.city,
                 'user_type': customer.user_type,
             }
-            
+
             # Add provider data if available
             try:
                 provider = customer.serviceprovider
@@ -156,13 +156,13 @@ def signup_view(request):
                 })
             except ServiceProvider.DoesNotExist:
                 pass
-            
+
             return render(request, 'accounts/signup_view.html', {
                 'services': services,
                 'initial_data': initial_data,
                 'is_edit': True
             })
-        
+
         # New signup case
         return render(request, 'accounts/signup_view.html', {
             'services': services,

@@ -1,4 +1,4 @@
-from accounts.models import Customer, ServiceProvider 
+from accounts.models import Customer, ServiceProvider
 
 def service_provider_profile(request):
     if request.user.is_authenticated:
