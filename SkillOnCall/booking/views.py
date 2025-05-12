@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Booking, Service, ServiceProvider
 from django.utils.timezone import now
-from django.urls import reverse
 
 
 @login_required
@@ -84,7 +83,7 @@ def my_allocation(request):
 
     return render(request, 'booking/my_allocation.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
 
-@login_required	
+@login_required
 def confirm_booking(request, booking_id):
     booking = Booking.objects.get(booking_id=booking_id)
     booking.status = 'Confirmed'
