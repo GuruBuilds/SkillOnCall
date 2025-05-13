@@ -30,13 +30,16 @@ def book_service(request, provider_id):
         # Prepare email content using the HTML template
         subject = "New Service Booking Request"
         base_url = request.build_absolute_uri('/')
-        accept_decline_url = f"{base_url}accept-decline-booking/{booking.booking_id}/"
+        accept_url = f"{base_url}accept-booking/{booking.access_token}/"
+        decline_url = f"{base_url}decline-booking/{booking.access_token}/"
+
         context = {
             'provider_name': service_provider,
             'customer_name': customer,
             'description_of_problem': description_of_problem,
             'services': services,
-            'accept_decline_url': accept_decline_url, 
+            'accept_url': accept_url, 
+            'decline_url': decline_url, 
             'company_name': 'Your Company Name',
             'current_year': now().year,
         }
@@ -84,7 +87,7 @@ def my_allocation(request):
     return render(request, 'booking/my_allocation.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
 
 @login_required
-def confirm_booking(request, booking_id):
+def accept_booking(request, booking_id):
     booking = Booking.objects.get(booking_id=booking_id)
     booking.status = 'Confirmed'
     booking.save()
@@ -111,7 +114,7 @@ def confirm_booking(request, booking_id):
     return redirect('my_allocation')
 
 @login_required
-def cancel_booking(request, booking_id):
+def decline_booking(request, booking_id):
     booking = Booking.objects.get(booking_id=booking_id)
     booking.status = 'Cancelled'
     booking.save()

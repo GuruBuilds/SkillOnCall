@@ -1,3 +1,6 @@
+import uuid
+import base64
+
 from django.db import models
 from accounts.models import Customer, ServiceProvider, Service
 
@@ -17,6 +20,14 @@ class Booking(models.Model):
     booking_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(choices=status_choices, max_length=10, default='Pending')
     description_of_problem = models.TextField()
+    access_token = models.CharField(max_length=100, unique=True, blank=True, null=True)
 
     def __str__(self):
         return f"Booking {self.booking_id} by User {self.customer_id.user.username}"
+
+    def save(self, *args, **kwargs):
+        if not self.access_token:
+            # Generate UUID and encode in URL-safe base64
+            token = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode('utf-8').rstrip('=')
+            self.access_token = token
+        super().save(*args, **kwargs)
