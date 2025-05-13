@@ -1,10 +1,12 @@
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.conf import settings
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Booking, Service, ServiceProvider
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.utils.timezone import now
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import Booking, Service, ServiceProvider
 
 
 @login_required
@@ -30,8 +32,8 @@ def book_service(request, provider_id):
         # Prepare email content using the HTML template
         subject = "New Service Booking Request"
         base_url = request.build_absolute_uri('/')
-        accept_url = f"{base_url}accept-booking/{booking.access_token}/"
-        decline_url = f"{base_url}decline-booking/{booking.access_token}/"
+        accept_url = f"{base_url}booking/accept-booking/{booking.access_token}/"
+        decline_url = f"{base_url}booking/decline-booking/{booking.access_token}/"
 
         context = {
             'provider_name': service_provider,
@@ -86,39 +88,30 @@ def my_allocation(request):
 
     return render(request, 'booking/my_allocation.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
 
-@login_required
-def accept_booking(request, booking_id):
-    booking = Booking.objects.get(booking_id=booking_id)
+@csrf_exempt
+def accept_booking(request, access_token):
+    booking = get_object_or_404(Booking, access_token=access_token)
+
+    if booking.status != 'Pending':
+        return render(request, 'booking/thank_you.html', {
+            'message': f'This booking has already been {booking.status.lower()}.'
+        })
+
     booking.status = 'Confirmed'
     booking.save()
 
-    # TODO for Gurupreet: send email to customer after confirmation
-    # Send confirmation email to the customer
-    # subject = "Booking Confirmation"
-    # context = {
-    #     'customer_name': booking.customer_id.user.first_name,
-    #     'service_provider_name': booking.service_provider_id.customer.user.first_name,
-    #     'description_of_problem': booking.description_of_problem,
-    #     'services': booking.service_id.all(),
-    #     'company_name': 'Your Company Name',
-    #     'current_year': now().year,
-    # }
-    # html_message = render_to_string('email_templates/booking_confirmation.html', context)
-    # from_email = settings.EMAIL_HOST_USER
+    return render(request, 'booking/thank_you.html', {'message': 'Booking confirmed successfully!'})
 
-    # try:
-    #     send_mail(subject, '', from_email, [booking.customer_id.user.email], html_message=html_message)
-    # except Exception as e:
-    #     print(f"Error sending confirmation email: {str(e)}")
+@csrf_exempt
+def decline_booking(request, access_token):
+    booking = get_object_or_404(Booking, access_token=access_token)
 
-    return redirect('my_allocation')
+    if booking.status != 'Pending':
+        return render(request, 'booking/thank_you.html', {
+            'message': f'This booking has already been {booking.status.lower()}.'
+        })
 
-@login_required
-def decline_booking(request, booking_id):
-    booking = Booking.objects.get(booking_id=booking_id)
     booking.status = 'Cancelled'
     booking.save()
 
-    # TODO for Gurupreet: send email to customer after cancellation
-
-    return redirect('my_allocation')
+    return render(request, 'booking/thank_you.html', {'message': 'Booking declined successfully!'})

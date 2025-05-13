@@ -147,4 +147,3 @@ EMAIL_USE_TLS = True  # Use TLS (True for Gmail, False for some others)
 EMAIL_HOST_USER = 'skilloncall69@gmail.com'  # Your email address
 EMAIL_HOST_PASSWORD = ''  # Your email password (or app-specific password for Gmail)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Optional: set default sender address
-
