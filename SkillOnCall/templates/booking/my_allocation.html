@@ -47,8 +47,8 @@
                             <div class="card-footer d-flex justify-content-between">
                                 <a href="" class="btn btn-outline-primary btn-sm">View</a>
                                 {% comment %} need to hide buttons after Accept/cancel based on condition {% endcomment %}
-                                <a href="{% url 'confirm_booking' booking.booking_id %}" class="btn btn-outline-success btn-sm">Accept</a>
-                                <a href="{% url 'cancel_booking' booking.booking_id %}" class="btn btn-outline-danger btn-sm">Cancel</a>
+                                <a href="{% url 'accept_booking' booking.booking_id %}" class="btn btn-outline-success btn-sm">Accept</a>
+                                <a href="{% url 'decline_booking' booking.booking_id %}" class="btn btn-outline-danger btn-sm">Decline</a>
                             </div>
                         </div>
                     </div>
