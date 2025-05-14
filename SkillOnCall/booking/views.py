@@ -108,11 +108,16 @@ def accept_booking(request, access_token):
         'description_of_problem': booking.description_of_problem,
         'services': booking.service_id.all(),
         'booking_date': booking.booking_date,
-        'company_name': "SkillOnCall",
         'current_year': now().year,
     }
     html_message = render_to_string('email_templates/booking_confirmation.html', context)
-    send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
+
+    try:
+        send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
+    except Exception as e:
+        return render(request, 'booking/thank_you.html', {
+            'message': f'Booking confirmed successfully, but there was an error sending the email: {str(e)}'
+        })
 
     return render(request, 'booking/thank_you.html', {'message': 'Booking confirmed successfully!'})
 
@@ -133,11 +138,16 @@ def decline_booking(request, access_token):
     context = {
         'customer_name': booking.customer_id.user.first_name,
         'service_provider_name': booking.service_provider_id.customer.user.first_name,
-        'company_name': "SkillOnCall",
         'current_year': now().year,
         'booking_date': booking.booking_date,
     }
     html_message = render_to_string('email_templates/booking_declined.html', context)
-    send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
+
+    try:
+        send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
+    except Exception as e:
+        return render(request, 'booking/thank_you.html', {
+            'message': f'Booking declined successfully, but there was an error sending the email: {str(e)}'
+        })
 
     return render(request, 'booking/thank_you.html', {'message': 'Booking declined successfully!'})
