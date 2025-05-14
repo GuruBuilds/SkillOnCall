@@ -1,96 +1,88 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404, render
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Booking, Service, ServiceProvider
+from booking.utils import send_booking_email
 
 
 @login_required
 def book_service(request, provider_id):
     customer = request.user.customer
-    service_provider = ServiceProvider.objects.get(id=provider_id)
+    service_provider = get_object_or_404(ServiceProvider, id=provider_id)
 
     if request.method == 'POST':
         service_ids = request.POST.getlist('services')
         description_of_problem = request.POST.get('description_of_problem')
-
         services = Service.objects.filter(pk__in=service_ids)
 
-        # Create the booking
-        booking = Booking(
+        booking = Booking.objects.create(
             customer_id=customer,
             service_provider_id=service_provider,
             description_of_problem=description_of_problem
         )
-        booking.save()
         booking.service_id.set(services)
 
-        # Prepare email content using the HTML template
-        subject = "New Service Booking Request"
+        # Email URLs
         base_url = request.build_absolute_uri('/')
         accept_url = f"{base_url}booking/accept-booking/{booking.access_token}/"
         decline_url = f"{base_url}booking/decline-booking/{booking.access_token}/"
 
+        # Email Context
         context = {
-            'provider_name': service_provider,
-            'customer_name': customer,
+            'provider_name': service_provider.customer.user.first_name,
+            'customer_name': customer.user.first_name,
             'description_of_problem': description_of_problem,
             'services': services,
-            'accept_url': accept_url, 
-            'decline_url': decline_url, 
-            'company_name': 'Your Company Name',
+            'accept_url': accept_url,
+            'decline_url': decline_url,
+            'company_name': 'SkillOnCall',
             'current_year': now().year,
         }
 
-        html_message = render_to_string('email_templates/booking_notification.html', context)
-        from_email = settings.EMAIL_HOST_USER
+        subject = "New Service Booking Request"
+        success, error = send_booking_email(subject, service_provider.customer.user.email, 'email_templates/booking_notification.html', context)
 
-        try:
-            send_mail(subject, '', from_email, [service_provider.customer.user.email], html_message=html_message)
-            message = "Booking created successfully and email sent to the provider!"
-        except Exception as e:
-            message = f"Booking created successfully, but there was an error sending the email: {str(e)}"
+        message = "Booking created successfully!"
+        if not success:
+            message += f" But email failed to send: {error}"
 
         bookings = Booking.objects.filter(customer_id=customer)
+        return render(request, 'booking/all_bookings.html', {'message': message, 'bookings': bookings})
 
-        return render(
-            request,
-            'booking/all_bookings.html',
-            {'message': message, 'bookings': bookings}
-        )
-
-    elif request.method == 'GET':
-        return render(request, 'booking/book_service.html', {'provider': service_provider})
+    return render(request, 'booking/book_service.html', {'provider': service_provider})
 
 @login_required
 def view_bookings(request):
     customer = request.user.customer
     bookings = Booking.objects.filter(customer_id=customer)
-    pending_bookings = bookings.filter(status='Pending')
-    confirmed_bookings = bookings.filter(status='Confirmed')
-    cancelled_bookings = bookings.filter(status='Cancelled')
-    completed_bookings = bookings.filter(status='Completed')
-
-    return render(request, 'booking/all_bookings.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
+    return render(request, 'booking/all_bookings.html', {
+        'bookings': bookings,
+        'pending_bookings': bookings.filter(status='Pending'),
+        'confirmed_bookings': bookings.filter(status='Confirmed'),
+        'cancelled_bookings': bookings.filter(status='Cancelled'),
+        'completed_bookings': bookings.filter(status='Completed'),
+    })
 
 @login_required
 def my_allocation(request):
     provider = request.user.customer.serviceprovider
     bookings = Booking.objects.filter(service_provider_id=provider)
-    pending_bookings = bookings.filter(status='Pending')
-    confirmed_bookings = bookings.filter(status='Confirmed')
-    cancelled_bookings = bookings.filter(status='Cancelled')
-    completed_bookings = bookings.filter(status='Completed')
-
-    return render(request, 'booking/my_allocation.html', {'bookings': bookings, 'pending_bookings': pending_bookings, 'confirmed_bookings': confirmed_bookings, 'cancelled_bookings': cancelled_bookings, 'completed_bookings': completed_bookings})
+    return render(request, 'booking/my_allocation.html', {
+        'bookings': bookings,
+        'pending_bookings': bookings.filter(status='Pending'),
+        'confirmed_bookings': bookings.filter(status='Confirmed'),
+        'cancelled_bookings': bookings.filter(status='Cancelled'),
+        'completed_bookings': bookings.filter(status='Completed'),
+    })
 
 @csrf_exempt
 def accept_booking(request, access_token):
-    booking = get_object_or_404(Booking, access_token=access_token)
+    booking = get_object_or_404(Booking.objects.select_related(
+        'customer_id__user', 'service_provider_id__customer__user'
+    ).prefetch_related('service_id'), access_token=access_token)
 
     if booking.status != 'Pending':
         return render(request, 'booking/thank_you.html', {
@@ -100,9 +92,8 @@ def accept_booking(request, access_token):
     booking.status = 'Confirmed'
     booking.save()
 
-    # Send confirmation email to customer
-    subject = "Booking Confirmed"
     context = {
+        'status': 'Confirmed',
         'customer_name': booking.customer_id.user.first_name,
         'service_provider_name': booking.service_provider_id.customer.user.first_name,
         'description_of_problem': booking.description_of_problem,
@@ -110,20 +101,21 @@ def accept_booking(request, access_token):
         'booking_date': booking.booking_date,
         'current_year': now().year,
     }
-    html_message = render_to_string('email_templates/booking_confirmation.html', context)
 
-    try:
-        send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
-    except Exception as e:
-        return render(request, 'booking/thank_you.html', {
-            'message': f'Booking confirmed successfully, but there was an error sending the email: {str(e)}'
-        })
+    subject = "Booking Confirmed"
+    success, error = send_booking_email(subject, booking.customer_id.user.email, 'email_templates/booking_status_email.html', context)
 
-    return render(request, 'booking/thank_you.html', {'message': 'Booking confirmed successfully!'})
+    message = "Booking confirmed successfully!"
+    if not success:
+        message += f" But email failed: {error}"
+
+    return render(request, 'booking/thank_you.html', {'message': message})
 
 @csrf_exempt
 def decline_booking(request, access_token):
-    booking = get_object_or_404(Booking, access_token=access_token)
+    booking = get_object_or_404(Booking.objects.select_related(
+        'customer_id__user', 'service_provider_id__customer__user'
+    ), access_token=access_token)
 
     if booking.status != 'Pending':
         return render(request, 'booking/thank_you.html', {
@@ -133,21 +125,20 @@ def decline_booking(request, access_token):
     booking.status = 'Cancelled'
     booking.save()
 
-    # Send cancellation email to customer
-    subject = "Booking Declined"
     context = {
+        'status': 'Declined',
         'customer_name': booking.customer_id.user.first_name,
         'service_provider_name': booking.service_provider_id.customer.user.first_name,
-        'current_year': now().year,
         'booking_date': booking.booking_date,
+        'current_year': now().year,
     }
-    html_message = render_to_string('email_templates/booking_declined.html', context)
 
-    try:
-        send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
-    except Exception as e:
-        return render(request, 'booking/thank_you.html', {
-            'message': f'Booking declined successfully, but there was an error sending the email: {str(e)}'
-        })
+    subject = "Booking Declined"
+    success, error = send_booking_email(subject, booking.customer_id.user.email, 'email_templates/booking_status_email.html', context)
 
-    return render(request, 'booking/thank_you.html', {'message': 'Booking declined successfully!'})
+    message = "Booking declined successfully!"
+    if not success:
+        message += f" But email failed: {error}"
+
+    return render(request, 'booking/thank_you.html', {'message': message})
+
