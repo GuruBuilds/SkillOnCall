@@ -100,6 +100,20 @@ def accept_booking(request, access_token):
     booking.status = 'Confirmed'
     booking.save()
 
+    # Send confirmation email to customer
+    subject = "Booking Confirmed"
+    context = {
+        'customer_name': booking.customer_id.user.first_name,
+        'service_provider_name': booking.service_provider_id.customer.user.first_name,
+        'description_of_problem': booking.description_of_problem,
+        'services': booking.service_id.all(),
+        'booking_date': booking.booking_date,
+        'company_name': "SkillOnCall",
+        'current_year': now().year,
+    }
+    html_message = render_to_string('email_templates/booking_confirmation.html', context)
+    send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
+
     return render(request, 'booking/thank_you.html', {'message': 'Booking confirmed successfully!'})
 
 @csrf_exempt
@@ -113,5 +127,17 @@ def decline_booking(request, access_token):
 
     booking.status = 'Cancelled'
     booking.save()
+
+    # Send cancellation email to customer
+    subject = "Booking Declined"
+    context = {
+        'customer_name': booking.customer_id.user.first_name,
+        'service_provider_name': booking.service_provider_id.customer.user.first_name,
+        'company_name': "SkillOnCall",
+        'current_year': now().year,
+        'booking_date': booking.booking_date,
+    }
+    html_message = render_to_string('email_templates/booking_declined.html', context)
+    send_mail(subject, '', settings.EMAIL_HOST_USER, [booking.customer_id.user.email], html_message=html_message)
 
     return render(request, 'booking/thank_you.html', {'message': 'Booking declined successfully!'})
