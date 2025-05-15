@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
@@ -27,8 +29,8 @@ def book_service(request, provider_id):
 
         # Email URLs
         base_url = request.build_absolute_uri('/')
-        accept_url = f"{base_url}booking/accept-booking/{booking.access_token}/"
-        decline_url = f"{base_url}booking/decline-booking/{booking.access_token}/"
+        accept_url = urljoin(base_url, f"booking/accept-booking/{booking.access_token}/")
+        decline_url = urljoin(base_url, f"booking/decline-booking/{booking.access_token}/")
 
         # Email Context
         context = {
@@ -141,4 +143,3 @@ def decline_booking(request, access_token):
         message += f" But email failed: {error}"
 
     return render(request, 'booking/thank_you.html', {'message': message})
-
