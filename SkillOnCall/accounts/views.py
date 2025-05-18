@@ -42,6 +42,7 @@ def signup_view(request):
         address = request.POST.get('address')
         city = request.POST.get('city')
         user_type = request.POST.get('user_type')
+        profile_image = request.FILES.get('profile_image')
 
         # Edit profile case
         if request.user.is_authenticated:
@@ -61,6 +62,8 @@ def signup_view(request):
             customer.address = address
             customer.city = city
             customer.user_type = user_type
+            if profile_image:
+                customer.profile_image = profile_image
             customer.save()
 
             # Handle service provider updates
@@ -108,7 +111,8 @@ def signup_view(request):
                 phone_number=phone_number,
                 address=address,
                 city=city,
-                user_type=user_type
+                user_type=user_type,
+                profile_image=profile_image
             )
 
             if user_type == 'provider':
@@ -155,6 +159,7 @@ def signup_view(request):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'phone_number': customer.phone_number,
+                'profile_image': customer.profile_image.url if customer.profile_image else '',
                 'address': customer.address,
                 'city': customer.city,
                 'user_type': customer.user_type,
@@ -177,7 +182,6 @@ def signup_view(request):
                 'is_edit': True
             })
 
-        # New signup form
         return render(request, 'accounts/signup_view.html', {
             'services': services,
             'initial_data': {},
