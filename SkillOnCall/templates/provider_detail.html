@@ -5,17 +5,91 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>{{ provider.customer.user.username }}</h2>
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Provider Image" class="img-thumbnail mb-3" style="max-width: 200px;">
-    <p><strong>Description:</strong> {{ provider.description }}</p>
-    <p><strong>Experience:</strong> {{ provider.experience }} years</p>
-    <p><strong>Charges:</strong> ₹{{ provider.charge_per_hour }} / hour</p>
-    <p><strong>Services Offered:</strong></p>
-    <ul>
-        {% for service in provider.services_offered.all %}
-            <li>{{ service.name }}</li>
-        {% endfor %}
-    </ul>
+<div class="container my-5">
+
+    <!-- Profile Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="row g-0">
+            <div class="col-md-3 text-center p-4">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Provider Image" class="img-fluid rounded-circle shadow-sm" style="max-width: 150px;">
+                <h4 class="mt-3">{{ provider.customer.user.username }}</h4>
+                <span class="badge bg-primary">{{ provider.customer.city }}</span>
+            </div>
+            <div class="col-md-9">
+                <div class="card-body">
+                    <p><strong>Description:</strong> {{ provider.description }}</p>
+                    <p><strong>Experience:</strong> {{ provider.experience }} years</p>
+                    <p><strong>Charges:</strong> <span class="text-success fw-bold">₹{{ provider.charge_per_hour }} / hour</span></p>
+                    <p><strong>Services Offered:</strong></p>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for service in provider.services_offered.all %}
+                            <span class="badge bg-secondary">{{ service.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Images Preview -->
+    <h3 class="mb-3">Work Gallery</h3>
+
+    {% if provider.images.count > 0 %}
+        <div class="row">
+            {% for work in provider.images.all|slice:":3" %}
+                <div class="col-sm-6 col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ work.image.url }}" class="card-img-top" alt="Work Image">
+                        <div class="card-body">
+                            <p class="card-text">{{ work.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if provider.images.count > 3 %}
+                <!-- Show More Card -->
+                <div class="col-sm-6 col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm d-flex align-items-center justify-content-center text-center" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#allImagesModal">
+                        <div class="card-body">
+                            <h5 class="card-title">View All Images</h5>
+                            <p class="text-muted">Click to see full gallery</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            No work images uploaded yet.
+        </div>
+    {% endif %}
+
+    <!-- Modal to Show All Images -->
+    <div class="modal fade" id="allImagesModal" tabindex="-1" aria-labelledby="allImagesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="allImagesModalLabel">All Work Images</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        {% for work in provider.images.all %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <img src="{{ work.image.url }}" class="card-img-top" alt="Work Image">
+                                    <div class="card-body">
+                                        <p class="card-text">{{ work.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

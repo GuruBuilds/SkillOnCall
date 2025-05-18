@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import Customer, ServiceProvider, Service
+from .models import Customer, ServiceProvider, Service, ServiceProviderImage
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,  logout
 from django.contrib import messages
@@ -174,3 +175,46 @@ def sign_out(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect(index)
+
+@login_required
+def upload_work_image(request):
+    try:
+        # Check if the user is a service provider
+        service_provider = request.user.customer.serviceprovider
+    except ServiceProvider.DoesNotExist:
+        messages.error(request, "You are not a service provider.")
+        return redirect('index')
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        description = request.POST.get('description')
+
+        if image:
+            ServiceProviderImage.objects.create(
+                service_provider=service_provider,
+                image=image,
+                description=description
+            )
+            messages.success(request, "Image uploaded successfully!")
+        else:
+            messages.error(request, "Please provide image.")
+        return redirect('upload_work_image')
+    else:
+        images = service_provider.images.all()
+        return render(request, 'accounts/upload_work_image.html', {'work_images': images})
+
+@login_required
+def delete_work_image(request, image_id):
+    try:
+        # Check if the user is a service provider
+        service_provider = request.user.customer.serviceprovider
+    except ServiceProvider.DoesNotExist:
+        messages.error(request, "You are not a service provider.")
+        return redirect('index')
+
+    try:
+        image = ServiceProviderImage.objects.get(id=image_id, service_provider=service_provider)
+        image.delete()
+        messages.success(request, "Image deleted successfully!")
+    except ServiceProviderImage.DoesNotExist:
+        messages.error(request, "Image not found or you do not have permission to delete it.")
+    return redirect('upload_work_image')
