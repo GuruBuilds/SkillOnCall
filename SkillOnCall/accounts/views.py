@@ -32,9 +32,12 @@ def sign_in(request):
 
 def signup_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
+        # Common fields
         username = request.POST.get('username')
         password = request.POST.get('password')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
         city = request.POST.get('city')
@@ -47,6 +50,8 @@ def signup_view(request):
 
             # Update user fields
             user.email = email
+            user.first_name = first_name
+            user.last_name = last_name
             if password:  # Only update password if provided
                 user.set_password(password)
             user.save()
@@ -65,7 +70,6 @@ def signup_view(request):
                 charge_per_hour = request.POST.get('charge_per_hour')
                 services = request.POST.getlist('services_offered')
 
-                # Get or create service provider
                 service_provider, created = ServiceProvider.objects.get_or_create(
                     customer=customer,
                     defaults={
@@ -83,14 +87,22 @@ def signup_view(request):
 
                 service_provider.services_offered.set(services)
             else:
-                # Remove service provider if user type changed to customer
+                # Remove provider if downgraded to customer
                 ServiceProvider.objects.filter(customer=customer).delete()
 
             messages.success(request, "Profile updated successfully!")
             return redirect('index')
 
+        # Signup case
         else:
-            user = User.objects.create_user(username=username, password=password, email=email)
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+
             customer = Customer.objects.create(
                 user=user,
                 phone_number=phone_number,
@@ -117,7 +129,7 @@ def signup_view(request):
             messages.success(request, "Account created successfully!")
             return redirect('index')
 
-    # GET request handling
+    # GET request - load form
     else:
         services = Service.objects.all()
 
@@ -140,13 +152,14 @@ def signup_view(request):
             initial_data = {
                 'username': user.username,
                 'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
                 'phone_number': customer.phone_number,
                 'address': customer.address,
                 'city': customer.city,
                 'user_type': customer.user_type,
             }
 
-            # Add provider data if available
             try:
                 provider = customer.serviceprovider
                 initial_data.update({
@@ -164,7 +177,7 @@ def signup_view(request):
                 'is_edit': True
             })
 
-        # New signup case
+        # New signup form
         return render(request, 'accounts/signup_view.html', {
             'services': services,
             'initial_data': {},

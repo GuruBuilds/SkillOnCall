@@ -10,18 +10,29 @@
         <!-- Basic Info -->
         <div class="row mb-3">
             <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" name="first_name" 
+                    value="{{ initial_data.first_name }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" name="last_name" 
+                    value="{{ initial_data.last_name }}" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
                 <label class="form-label">Username</label>
                 <input type="text" class="form-control" name="username" 
-                       value="{{ initial_data.username }}" {% if is_edit %}readonly{% endif %} required>
+                    value="{{ initial_data.username }}" {% if is_edit %}readonly{% endif %} required>
                 {% if is_edit %}<small class="text-muted">Username cannot be changed</small>{% endif %}
             </div>
             <div class="col-md-6">
                 <label class="form-label">Email</label>
                 <input type="email" class="form-control" name="email" 
-                       value="{{ initial_data.email }}" required>
+                    value="{{ initial_data.email }}" required>
             </div>
         </div>
-        
         <!-- Password Fields -->
         {% if is_edit %}
         <div class="row mb-3">

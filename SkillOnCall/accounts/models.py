@@ -8,6 +8,7 @@ class Customer(models.Model):
     address = models.TextField()
     city = models.CharField(max_length=100)
     user_type = models.CharField(choices=[('customer', 'Customer'), ('provider', 'Service Provider')], default='customer')
+    profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
 
     def __str__(self):
         return self.user.username
