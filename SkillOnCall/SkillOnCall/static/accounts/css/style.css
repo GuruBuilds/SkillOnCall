@@ -1,0 +1,20 @@
+.card {
+    border-radius: 0.5rem;
+}
+.card-header {
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+select[multiple] {
+    background-image: none !important;
+    padding: 0.25rem !important;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+.position-relative {
+    transition: transform 0.2s;
+}
+.position-relative:hover {
+    transform: scale(1.03);
+}
