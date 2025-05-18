@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, ServiceProvider, Service
+from .models import Customer, ServiceProvider, Service, ServiceProviderImage
 
 
 class CustomerAdmin(admin.ModelAdmin):
@@ -23,3 +23,9 @@ class ServiceAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
 admin.site.register(Service, ServiceAdmin)
+
+class ServiceProviderImageAdmin(admin.ModelAdmin):
+    list_display = ('service_provider', 'image', 'description')
+    search_fields = ('service_provider__customer__user__username', 'description')
+    ordering = ('service_provider',)
+admin.site.register(ServiceProviderImage, ServiceProviderImageAdmin)

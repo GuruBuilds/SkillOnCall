@@ -28,3 +28,11 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+
+class ServiceProviderImage(models.Model):
+    service_provider = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='service_provider_images/')
+    description = models.TextField()
+
+    def __str__(self):
+        return f"Image for {self.service_provider.customer.user.username}"
