@@ -1,152 +1,215 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{% if is_edit %}Edit Profile{% else %}Sign Up{% endif %}{% endblock %}
 
+<!-- Link CSS -->
+{% block style %}
+<link rel="stylesheet" href="{% static 'accounts/css/style.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container my-5">
-    <h2 class="mb-4">{% if is_edit %}Edit Your Profile{% else %}Create Your Account{% endif %}</h2>
-    <form method="post" class="row g-3" enctype="multipart/form-data">
-        {% csrf_token %}
-        <!-- Basic Info -->
-        <div class="mb-3">
-            <label class="form-label">Profile Image</label>
-            <input type="file" class="form-control" name="profile_image">
-            {% if request.user.is_authenticated and initial_data.profile_image %}
-                <div class="mt-2">
-                    <p>Current Image:</p>
-                    <img src="{{ initial_data.profile_image }}" alt="Profile Image" height="100">
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <!-- Form Header -->
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 text-center">
+                        {% if is_edit %}
+                        <i class="bi bi-person-gear me-2"></i>Edit Profile
+                        {% else %}
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                        {% endif %}
+                    </h4>
                 </div>
-            {% endif %}
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">First Name</label>
-                <input type="text" class="form-control" name="first_name" 
-                    value="{{ initial_data.first_name }}" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Last Name</label>
-                <input type="text" class="form-control" name="last_name" 
-                    value="{{ initial_data.last_name }}" required>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" name="username" 
-                    value="{{ initial_data.username }}" {% if is_edit %}readonly{% endif %} required>
-                {% if is_edit %}<small class="text-muted">Username cannot be changed</small>{% endif %}
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" 
-                    value="{{ initial_data.email }}" required>
-            </div>
-        </div>
-        <!-- Password Fields -->
-        {% if is_edit %}
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">New Password</label>
-                <input type="password" class="form-control" name="password"
-                       placeholder="Leave blank to keep current password">
-            </div>
-        </div>
-        {% else %}
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" name="Confirmpassword">
-            </div>
-        </div>
-        {% endif %}
 
-        <!-- Contact Info -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">City</label>
-                <input type="text" class="form-control" name="city" value="{{ initial_data.city }}">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Phone Number</label>
-                <input type="text" class="form-control" name="phone_number" value="{{ initial_data.phone_number }}">
-            </div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Address</label>
-            <textarea class="form-control" name="address" rows="2">{{ initial_data.address }}</textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">User Type</label>
-            <select class="form-select" name="user_type" id="userTypeSelect">
-                <option value="customer" {% if initial_data.user_type == 'customer' %}selected{% endif %}>Customer</option>
-                <option value="provider" {% if initial_data.user_type == 'provider' %}selected{% endif %}>Service Provider</option>
-            </select>
-        </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-        <!-- Provider-Specific Fields -->
-        <div id="providerFields" class="border p-3 rounded bg-light mb-4" 
-             style="display: {% if initial_data.user_type == 'provider' %}block{% else %}none{% endif %};">
-            <h5 class="mb-3">Service Provider Information</h5>
+                        <!-- Top Row with Profile Image and Basic Info -->
+                        <div class="row align-items-center mb-4">
+                            <!-- Profile Image Column -->
+                            <div class="col-md-3 text-center">
+                                <div class="position-relative d-inline-block mb-3 mb-md-0">
+                                    {% if request.user.is_authenticated and initial_data.profile_image %}
+                                        <img id="profileImagePreview" src="{{ initial_data.profile_image }}"
+                                             class="rounded-circle shadow" width="100" height="100"
+                                             alt="Profile picture">
+                                    {% else %}
+                                        <div id="profileImagePreview"
+                                             class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                             style="width: 100px; height: 100px;">
+                                            <i class="bi bi-person-fill text-muted" style="font-size: 2.5rem;"></i>
+                                        </div>
+                                    {% endif %}
+                                    <label class="btn btn-sm btn-secondary rounded-circle position-absolute bottom-0 end-0 mb-0 me-0"
+                                           style="width: 32px; height: 32px;"
+                                           title="Change profile picture">
+                                        <i class="bi bi-camera-fill"></i>
+                                        <input type="file" name="profile_image" class="d-none"
+                                               onchange="previewImage(this, 'profileImagePreview')">
+                                    </label>
+                                </div>
+                            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Services Offered</label>
-                <select class="form-select" name="services_offered" multiple>
-                    {% for service in services %}
-                        <option value="{{ service.id }}"
-                            {% if service.id in initial_data.services_offered %}selected{% endif %}>
-                            {{ service.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <small class="text-muted">Hold Ctrl/Cmd to select multiple services</small>
-            </div>
+                            <!-- Basic Info Column -->
+                            <div class="col-md-9">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" name="first_name"
+                                               value="{{ initial_data.first_name }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" name="last_name"
+                                               value="{{ initial_data.last_name }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" name="username"
+                                               value="{{ initial_data.username }}" {% if is_edit %}readonly{% endif %} required>
+                                        {% if is_edit %}<small class="text-muted">Username cannot be changed</small>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" name="email"
+                                               value="{{ initial_data.email }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Experience (Years)</label>
-                    <input type="number" class="form-control" name="experience" 
-                           value="{{ initial_data.experience|default:0 }}">
+                        <!-- Main Form Content -->
+                        <div class="row g-3">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <!-- Password -->
+                                {% if is_edit %}
+                                <div class="mb-3">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" class="form-control" name="password"
+                                           placeholder="Leave blank to keep current password">
+                                    <small class="text-muted">Minimum 8 characters</small>
+                                </div>
+                                {% else %}
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" name="password" required>
+                                    <small class="text-muted">Minimum 8 characters</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" name="Confirmpassword" required>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <!-- User Type -->
+                                <div class="mb-3">
+                                    <label class="form-label">Account Type</label>
+                                    <select class="form-select" name="user_type" id="userTypeSelect">
+                                        <option value="customer" {% if initial_data.user_type == 'customer' %}selected{% endif %}>
+                                            Customer
+                                        </option>
+                                        <option value="provider" {% if initial_data.user_type == 'provider' %}selected{% endif %}>
+                                            Service Provider
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Contact Info -->
+                                <div class="mb-3">
+                                    <label class="form-label">City</label>
+                                    <input type="text" class="form-control" name="city"
+                                           value="{{ initial_data.city }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" name="phone_number"
+                                       value="{{ initial_data.phone_number }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control" name="address"
+                                       value="{{ initial_data.address }}">
+                            </div>
+                        </div>
+
+                        <!-- Provider Fields (Collapsible) -->
+                        <div id="providerFields" class="mt-3"
+                             style="display: {% if initial_data.user_type == 'provider' %}block{% else %}none{% endif %};">
+                            <div class="card card-body bg-light">
+                                <h6 class="mb-3"><i class="bi bi-tools me-2"></i>Professional Information</h6>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Services</label>
+                                    <select class="form-select form-select-sm" name="services_offered" multiple size="3">
+                                        {% for service in services %}
+                                            <option value="{{ service.id }}"
+                                                {% if service.id in initial_data.services_offered %}selected{% endif %}>
+                                                {{ service.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Experience (Years)</label>
+                                        <input type="number" class="form-control form-control-sm" name="experience"
+                                               value="{{ initial_data.experience|default:0 }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Rate/Hour</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" name="charge_per_hour"
+                                               value="{{ initial_data.charge_per_hour|default:0 }}">
+                                    </div>
+                                </div>
+
+                                <div class="mt-2">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control form-control-sm" name="description" rows="2">{{ initial_data.description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_edit %}
+                                <i class="bi bi-check-circle me-2"></i>Update Profile
+                                {% else %}
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                                {% endif %}
+                            </button>
+                            {% if is_edit %}
+                            <a href="{% url 'index' %}" class="btn btn-outline-secondary mt-2">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
+                            </a>
+                            {% endif %}
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Charge Per Hour</label>
-                    <input type="number" step="0.01" class="form-control" name="charge_per_hour" 
-                           value="{{ initial_data.charge_per_hour|default:0 }}">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea class="form-control" name="description" rows="3">{{ initial_data.description }}</textarea>
             </div>
         </div>
-
-        <div class="d-flex">
-            <button type="submit" class="btn btn-primary me-2">
-                {% if is_edit %}Update Profile{% else %}Sign Up{% endif %}
-            </button>
-            {% if is_edit %}
-            <a href="{% url 'index' %}" class="btn btn-outline-secondary">Cancel</a>
-            {% endif %}
-        </div>
-    </form>
+    </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const userTypeSelect = document.getElementById('userTypeSelect');
-        const providerFields = document.getElementById('providerFields');
-        
-        function toggleProviderFields() {
-            providerFields.style.display = userTypeSelect.value === 'provider' ? 'block' : 'none';
-        }
-        
-        userTypeSelect.addEventListener('change', toggleProviderFields);
-        toggleProviderFields();
-    });
-</script>
+{% endblock %}
+
+<!-- JS -->
+{% block script %}
+<script src="{% static 'js/script.js' %}"></script>
 {% endblock %}

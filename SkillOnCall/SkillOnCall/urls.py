@@ -29,4 +29,8 @@ urlpatterns = [
 # Only serve media files during development
 # In production, media files should be served by a proper web server (e.g., Nginx)
 if settings.DEBUG:
+    # Serve media files
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # Serve static files (JS, CSS, etc.)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
