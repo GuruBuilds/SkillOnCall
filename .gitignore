@@ -175,6 +175,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-
 # Virtual Enviornment
 myenv/
+
+# Media files
+media/
