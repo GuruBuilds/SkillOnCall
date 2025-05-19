@@ -165,6 +165,7 @@ def signup_view(request):
                 'user_type': customer.user_type,
             }
 
+            # Add provider data if available
             try:
                 provider = customer.serviceprovider
                 initial_data.update({
@@ -176,6 +177,7 @@ def signup_view(request):
             except ServiceProvider.DoesNotExist:
                 pass
 
+            # New signup case
             return render(request, 'accounts/signup_view.html', {
                 'services': services,
                 'initial_data': initial_data,
