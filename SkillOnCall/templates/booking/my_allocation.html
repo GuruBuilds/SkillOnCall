@@ -5,194 +5,160 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Your Service Bookings</h2>
+<div class="container my-5">
+    <h2 class="text-center mb-5 fw-bold">Your Service Bookings</h2>
 
     {% if bookings %}
         {% if pending_bookings %}
-        <h3 class="mb-4 text-center">Pending services</h3>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for booking in pending_bookings %}
-                    <div class="col">
-                        <div class="card h-100 shadow-sm border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <strong>Booking ID:</strong> {{ booking.booking_id }}
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ booking.service_provider_id.customer.user.username }}</h5>
-
-                                <p><strong>Status:</strong>
-                                    {% if booking.status == 'Confirmed' %}
-                                        <span class="badge bg-success">{{ booking.status }}</span>
-                                    {% elif booking.status == 'Pending' %}
-                                        <span class="badge bg-warning text-dark">{{ booking.status }}</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">{{ booking.status }}</span>
-                                    {% endif %}
-                                </p>
-
-                                <p><strong>Booked On:</strong> {{ booking.booking_date|date:"F d, Y h:i A" }}</p>
-
-                                <p><strong>Services:</strong></p>
-                                <ul class="list-group list-group-flush mb-3">
-                                    {% for service in booking.service_id.all %}
-                                        <li class="list-group-item">{{ service.name }}</li>
-                                    {% endfor %}
-                                </ul>
-
-                                <p><strong>Description:</strong><br>
-                                    {{ booking.description_of_problem }}
-                                </p>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <a href="" class="btn btn-outline-primary btn-sm">View</a>
-                                {% comment %} need to hide buttons after Accept/cancel based on condition {% endcomment %}
-                                <a href="{% url 'accept_booking' booking.booking_id %}" class="btn btn-outline-success btn-sm">Accept</a>
-                                <a href="{% url 'decline_booking' booking.booking_id %}" class="btn btn-outline-danger btn-sm">Decline</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+        <h5 class="mb-3 text-warning"><i class="bi bi-hourglass-split me-1"></i>Pending Services</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="table-warning text-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Booked On</th>
+                        <th>Services</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in pending_bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td>{{ booking.service_provider_id.customer.user.username }}</td>
+                        <td>{{ booking.booking_date|date:"M d, Y h:i A" }}</td>
+                        <td>
+                            {% for service in booking.service_id.all %}
+                                <span class="badge bg-light text-dark border">{{ service.name }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ booking.description_of_problem|truncatechars:50 }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                            <a href="{% url 'accept_booking' booking.booking_id %}" class="btn btn-sm btn-outline-success">Accept</a>
+                            <a href="{% url 'decline_booking' booking.booking_id %}" class="btn btn-sm btn-outline-danger">Decline</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% endif %}
 
         {% if confirmed_bookings %}
-        <h3 class="mt-4 mb-4 text-center">Confirmed services</h3>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for booking in confirmed_bookings %}
-                    <div class="col">
-                        <div class="card h-100 shadow-sm border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <strong>Booking ID:</strong> {{ booking.booking_id }}
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ booking.service_provider_id.customer.user.username }}</h5>
-
-                                <p><strong>Status:</strong>
-                                    {% if booking.status == 'Confirmed' %}
-                                        <span class="badge bg-success">{{ booking.status }}</span>
-                                    {% elif booking.status == 'Pending' %}
-                                        <span class="badge bg-warning text-dark">{{ booking.status }}</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">{{ booking.status }}</span>
-                                    {% endif %}
-                                </p>
-
-                                <p><strong>Booked On:</strong> {{ booking.booking_date|date:"F d, Y h:i A" }}</p>
-
-                                <p><strong>Services:</strong></p>
-                                <ul class="list-group list-group-flush mb-3">
-                                    {% for service in booking.service_id.all %}
-                                        <li class="list-group-item">{{ service.name }}</li>
-                                    {% endfor %}
-                                </ul>
-
-                                <p><strong>Description:</strong><br>
-                                    {{ booking.description_of_problem }}
-                                </p>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <a href="" class="btn btn-outline-primary btn-sm">View</a>
-                                <a href="" class="btn btn-outline-success btn-sm">Complete</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+        <h5 class="mb-3 text-success"><i class="bi bi-check-circle-fill me-1"></i>Confirmed Services</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="table-success text-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Booked On</th>
+                        <th>Services</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in confirmed_bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td>{{ booking.service_provider_id.customer.user.username }}</td>
+                        <td>{{ booking.booking_date|date:"M d, Y h:i A" }}</td>
+                        <td>
+                            {% for service in booking.service_id.all %}
+                                <span class="badge bg-light text-dark border">{{ service.name }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ booking.description_of_problem|truncatechars:50 }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                            <a href="#" class="btn btn-sm btn-outline-success">Complete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% endif %}
 
         {% if cancelled_bookings %}
-        <h3 class="mt-4 mb-4 text-center">Canclled services</h3>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for booking in cancelled_bookings %}
-                    <div class="col">
-                        <div class="card h-100 shadow-sm border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <strong>Booking ID:</strong> {{ booking.booking_id }}
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ booking.service_provider_id.customer.user.username }}</h5>
-
-                                <p><strong>Status:</strong>
-                                    {% if booking.status == 'Confirmed' %}
-                                        <span class="badge bg-success">{{ booking.status }}</span>
-                                    {% elif booking.status == 'Pending' %}
-                                        <span class="badge bg-warning text-dark">{{ booking.status }}</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">{{ booking.status }}</span>
-                                    {% endif %}
-                                </p>
-
-                                <p><strong>Booked On:</strong> {{ booking.booking_date|date:"F d, Y h:i A" }}</p>
-
-                                <p><strong>Services:</strong></p>
-                                <ul class="list-group list-group-flush mb-3">
-                                    {% for service in booking.service_id.all %}
-                                        <li class="list-group-item">{{ service.name }}</li>
-                                    {% endfor %}
-                                </ul>
-
-                                <p><strong>Description:</strong><br>
-                                    {{ booking.description_of_problem }}
-                                </p>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <a href="" class="btn btn-outline-primary btn-sm">View</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+        <h5 class="mb-3 text-danger"><i class="bi bi-x-circle-fill me-1"></i>Cancelled Services</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="table-danger text-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Booked On</th>
+                        <th>Services</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in cancelled_bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td>{{ booking.service_provider_id.customer.user.username }}</td>
+                        <td>{{ booking.booking_date|date:"M d, Y h:i A" }}</td>
+                        <td>
+                            {% for service in booking.service_id.all %}
+                                <span class="badge bg-light text-dark border">{{ service.name }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ booking.description_of_problem|truncatechars:50 }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% endif %}
 
         {% if completed_bookings %}
-        <h3 class="mt-4 mb-4 text-center">Completed services</h3>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for booking in completed_bookings %}
-                    <div class="col">
-                        <div class="card h-100 shadow-sm border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <strong>Booking ID:</strong> {{ booking.booking_id }}
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ booking.service_provider_id.customer.user.username }}</h5>
-
-                                <p><strong>Status:</strong>
-                                    {% if booking.status == 'Confirmed' %}
-                                        <span class="badge bg-success">{{ booking.status }}</span>
-                                    {% elif booking.status == 'Pending' %}
-                                        <span class="badge bg-warning text-dark">{{ booking.status }}</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">{{ booking.status }}</span>
-                                    {% endif %}
-                                </p>
-
-                                <p><strong>Booked On:</strong> {{ booking.booking_date|date:"F d, Y h:i A" }}</p>
-
-                                <p><strong>Services:</strong></p>
-                                <ul class="list-group list-group-flush mb-3">
-                                    {% for service in booking.service_id.all %}
-                                        <li class="list-group-item">{{ service.name }}</li>
-                                    {% endfor %}
-                                </ul>
-
-                                <p><strong>Description:</strong><br>
-                                    {{ booking.description_of_problem }}
-                                </p>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <a href="" class="btn btn-outline-primary btn-sm">View</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-    {% else %}
-        <div class="alert alert-info text-center" role="alert">
-            You have not alloted any bookings yet.
+        <h5 class="mb-3 text-info"><i class="bi bi-patch-check-fill me-1"></i>Completed Services</h5>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="table-info text-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Booked On</th>
+                        <th>Services</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in completed_bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td>{{ booking.service_provider_id.customer.user.username }}</td>
+                        <td>{{ booking.booking_date|date:"M d, Y h:i A" }}</td>
+                        <td>
+                            {% for service in booking.service_id.all %}
+                                <span class="badge bg-light text-dark border">{{ service.name }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ booking.description_of_problem|truncatechars:50 }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% endif %}
+    {% else %}
+    <div class="alert alert-info text-center" role="alert">
+        <i class="bi bi-info-circle-fill"></i> You have not been assigned any bookings yet.
+    </div>
     {% endif %}
 </div>
 {% endblock %}
