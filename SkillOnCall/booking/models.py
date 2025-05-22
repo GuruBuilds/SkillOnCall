@@ -1,3 +1,4 @@
+from django.utils import timezone
 import uuid
 import base64
 
@@ -17,7 +18,7 @@ class Booking(models.Model):
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     service_provider_id = models.ForeignKey(ServiceProvider, on_delete=models.CASCADE)
     service_id = models.ManyToManyField(Service, related_name='services_booked')
-    booking_date = models.DateTimeField(auto_now_add=True)
+    booking_date = models.DateTimeField(default=timezone.now())
     status = models.CharField(choices=status_choices, max_length=10, default='Pending')
     description_of_problem = models.TextField()
     access_token = models.CharField(max_length=100, unique=True, blank=True, null=True)
