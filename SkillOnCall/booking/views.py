@@ -2,12 +2,14 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Booking, Service, ServiceProvider
+from .forms import BookingEditForm
 from booking.utils import send_booking_email
+from django.contrib import messages
 
 
 @login_required
@@ -143,3 +145,21 @@ def decline_booking(request, access_token):
         message += f" But email failed: {error}"
 
     return render(request, 'booking/thank_you.html', {'message': message})
+
+@login_required
+def edit_booking(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id, customer_id=request.user.customer)
+
+    if request.method == 'POST':
+        form = BookingEditForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Booking updated successfully.")
+            return redirect('view_bookings')
+    else:
+        form = BookingEditForm(instance=booking)
+        # Format booking_date for input field
+        if booking.booking_date:
+            form.fields['booking_date'].initial = booking.booking_date.strftime('%Y-%m-%dT%H:%M')
+
+    return render(request, 'booking/edit_booking.html', {'form': form, 'booking': booking})

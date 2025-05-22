@@ -1,0 +1,55 @@
+{% extends '../base.html' %}
+
+{% block title %}Edit Booking{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h4 class="mb-0">Edit Booking #{{ booking.booking_id }}</h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.service_id.id_for_label }}" class="form-label">Services</label>
+                            {{ form.service_id }}
+                            {% if form.service_id.errors %}
+                                <div class="text-danger">{{ form.service_id.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description_of_problem.id_for_label }}" class="form-label">Problem Description</label>
+                            {{ form.description_of_problem }}
+                            {% if form.description_of_problem.errors %}
+                                <div class="text-danger">{{ form.description_of_problem.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.booking_date.id_for_label }}" class="form-label">Booking Date & Time</label>
+                            {{ form.booking_date }}
+                            {% if form.booking_date.errors %}
+                                <div class="text-danger">{{ form.booking_date.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'view_bookings' %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Booking</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
