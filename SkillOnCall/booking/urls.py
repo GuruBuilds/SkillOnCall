@@ -2,7 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('<int:provider_id>', views.book_service, name='book_service'),
+    path('<int:provider_id>', views.book_update_service, name='book_service'),
+    path('<int:provider_id>/<int:booking_id>/', views.book_update_service, name='update_booking'),
     path('view-bookings/', views.view_bookings, name='view_bookings'),
     path('my-allocation/', views.my_allocation, name='my_allocation'),
     # path('<int:booking_id>/', views.booking_detail, name='booking_detail'),
