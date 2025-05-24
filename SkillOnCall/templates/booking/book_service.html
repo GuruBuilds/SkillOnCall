@@ -23,20 +23,29 @@
             <label for="services" class="form-label">Select Services</label>
             <select class="form-select" id="services" name="services" multiple>
                 {% for service in provider.services_offered.all %}
-                    <option value="{{ service.id }}">{{ service.name }}</option>
+                    <option value="{{ service.id }}"
+                        {% if booking and service in booking.service_id.all %}selected{% endif %}>
+                        {{ service.name }}
+                    </option>
                 {% endfor %}
             </select>
             <small class="form-text text-muted">Hold down 'Ctrl' (Windows) or 'Command' (Mac) to select multiple services.</small>
         </div>
 
+
         <div class="mb-3">
-            <input type="datetime-local" class="form-control" name="booking_date" id="booking_date"/>
+            {% if booking %}
+                <input type="datetime-local" class="form-control" name="booking_date"
+                        value="{{ booking.booking_date|date:'Y-m-d\\TH:i' }}">
+            {% else %}
+                <input type="datetime-local" class="form-control" name="booking_date">
+            {% endif %}
         </div>
 
         <!-- Problem Description -->
         <div class="mb-3">
             <label for="problem_description" class="form-label">Description of the Problem</label>
-            <textarea class="form-control" id="problem_description" name="description_of_problem" rows="4" required></textarea>
+            <textarea class="form-control" id="problem_description" name="description_of_problem" rows="4" value="{{booking.description_of_problem}}" required>{% if booking %}{{ booking.description_of_problem }}{% endif %}</textarea>
         </div>
 
         <!-- Submit Button -->

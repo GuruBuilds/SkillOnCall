@@ -1,4 +1,6 @@
 from urllib.parse import urljoin
+from datetime import datetime
+
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -11,7 +13,7 @@ from booking.utils import send_booking_email
 
 
 @login_required
-def book_service(request, provider_id):
+def book_update_service(request, provider_id, booking_id=None):
     customer = request.user.customer
     service_provider = get_object_or_404(ServiceProvider, id=provider_id)
 
@@ -19,13 +21,27 @@ def book_service(request, provider_id):
         service_ids = request.POST.getlist('services')
         description_of_problem = request.POST.get('description_of_problem')
         services = Service.objects.filter(pk__in=service_ids)
+        booking_date = request.POST.get('booking_date')
+        booking_date = datetime.strptime(booking_date, '%Y-%m-%dT%H:%M')
 
-        booking = Booking.objects.create(
-            customer_id=customer,
-            service_provider_id=service_provider,
-            description_of_problem=description_of_problem
-        )
-        booking.service_id.set(services)
+        if booking_id:
+            booking = get_object_or_404(Booking, booking_id=booking_id, customer_id=customer)
+            booking.description_of_problem = description_of_problem
+            booking.service_id.set(services)
+            booking.booking_date = booking_date
+            booking.save()
+            message = "Booking updated successfully!"
+            subject = "Update service Booking Request"
+        else:
+            booking = Booking.objects.create(
+                customer_id=customer,
+                service_provider_id=service_provider,
+                description_of_problem=description_of_problem,
+                booking_date=booking_date,
+            )
+            booking.service_id.set(services)
+            subject = "New Service Booking Request"
+            message = "Booking created successfully!"
 
         # Email URLs
         base_url = request.build_absolute_uri('/')
@@ -37,6 +53,7 @@ def book_service(request, provider_id):
             'provider_name': service_provider.customer.user.first_name,
             'customer_name': customer.user.first_name,
             'description_of_problem': description_of_problem,
+            'booking_date': booking_date,
             'services': services,
             'accept_url': accept_url,
             'decline_url': decline_url,
@@ -44,17 +61,18 @@ def book_service(request, provider_id):
             'current_year': now().year,
         }
 
-        subject = "New Service Booking Request"
         success, error = send_booking_email(subject, service_provider.customer.user.email, 'email_templates/booking_notification.html', context)
 
-        message = "Booking created successfully!"
         if not success:
             message += f" But email failed to send: {error}"
 
         bookings = Booking.objects.filter(customer_id=customer)
         return render(request, 'booking/all_bookings.html', {'message': message, 'bookings': bookings})
 
-    return render(request, 'booking/book_service.html', {'provider': service_provider})
+    context = {'provider': service_provider}
+    if booking_id:
+        context['booking'] = get_object_or_404(Booking, booking_id=booking_id, customer_id=customer)
+    return render(request, 'booking/book_service.html', context)
 
 @login_required
 def view_bookings(request):
