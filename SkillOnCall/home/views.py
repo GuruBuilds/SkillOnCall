@@ -28,3 +28,18 @@ def explore_service(request, service_id):
     service = get_object_or_404(Service, id=service_id)
     providers = ServiceProvider.objects.filter(services_offered=service)
     return render(request, 'explore_service.html', {'service': service, 'providers': providers})
+
+def search(request):
+    query = request.GET.get('search_query', '').strip()
+    if len(query) > 50:
+        return render(request, 'search_results.html', {'error': 'Search query is too long.'})
+    if query:
+        providers = ServiceProvider.objects.filter(
+            customer__user__username__icontains=query
+        ) 
+        services = Service.objects.filter(name__icontains=query)
+    else:
+        providers = ServiceProvider.objects.none()
+        services = Service.objects.none()
+    
+    return render(request, 'search_results.html', {'providers': providers, 'services': services, 'query': query})
