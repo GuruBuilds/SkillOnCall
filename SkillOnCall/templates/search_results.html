@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Search Results
+{% endblock %}
+
+{% block content %}
+{% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+{% endif %}
+
+ {% if query %}
+        <h5 class="mb-3 text-center">Results for "<strong>{{ query }}</strong>":</h5>
+
+        {% if not providers and not services %}
+            <p class="text-center text-muted">No service providers or services found.</p>
+        {% else %}
+            <!-- Providers Section -->
+            {% if providers %}
+            <div class="mb-5">
+                <h5>Service Providers</h5>
+                {% for provider in providers %}
+                    <div class="col-md-3">
+                    <div class="card mb-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="card-img-top" alt="Provider Image">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ provider.customer.user.username }}</h5>
+                            {% for service in provider.services_offered.all %}
+                                <span class="badge bg-primary">{{ service.name }}</span>
+                            {% endfor %}
+                            <p class="card-text">{{ provider.description|truncatewords:15 }}</p>
+                            <p><strong>Experience:</strong> {{ provider.experience }} years</p>
+                            <p><strong>Charges:</strong> ₹{{ provider.charge_per_hour }} / hour</p>
+                            <a href="{% url 'provider_detail' provider.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            <a href="{% url 'book_service' provider.id %}" class="btn btn-sm btn-outline-secondary">Hire Me</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Services Section -->
+            {% if services %}
+            <div class="mb-5">
+                <h5>Services</h5>
+                {% for service in services %}
+                    <span class="">
+                        <a href="{% url 'explore_service' service.id %}" class="btn btn-lg btn-outline-primary rounded-pill me-2">{{ service.name }}</a>
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <p class="text-center text-muted">Enter a search query to find service providers and services.</p>
+    {% endif %}
+{% endblock %}
