@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',  # Custom app for user accounts
     'home',
     'booking',
+    'widget_tweaks',  # For better form rendering
 ]
 
 MIDDLEWARE = [
