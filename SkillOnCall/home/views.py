@@ -41,5 +41,14 @@ def search(request):
     else:
         providers = ServiceProvider.objects.none()
         services = Service.objects.none()
-    
     return render(request, 'search_results.html', {'providers': providers, 'services': services, 'query': query})
+
+def newIndex(request):
+    four_providers = ServiceProvider.objects.all()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        four_providers = four_providers.exclude(customer=customer)[:4]
+    else:
+        four_providers = four_providers[:4]
+    services = Service.objects.all()[:3]
+    return render(request, 'new_index.html', {'four_providers': four_providers, 'services': services})
