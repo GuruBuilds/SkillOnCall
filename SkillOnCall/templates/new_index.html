@@ -1,0 +1,321 @@
+{% extends 'new_base.html' %}
+
+{% block title %}
+    SkillOnCall | | Premium Service Booking Platform
+{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1>Premium Services at Your Doorstep</h1>
+                <p>Discover and book top-rated professionals for all your home service needs. Quality guaranteed, satisfaction assured.</p>
+                
+                <div class="hero-buttons">
+                    <a href="{% url 'all_providers' %}" class="btn btn-secondary">Book a Pro <i class="fas fa-arrow-right"></i></a>
+                    {% if user.is_authenticated and not service_provider %}
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline">Become a Provider</a>
+                    {% endif %}
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-text">
+                            <h3>10K+</h3>
+                            <p>Happy Clients</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-user-tie"></i>
+                        <div class="stat-text">
+                            <h3>2.5K+</h3>
+                            <p>Professionals</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Professional at work">
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container services-container">
+            <div class="section-title">
+                <span class="subtitle">Our Services</span>
+                <h2>Premium Home Services</h2>
+                <p>From routine maintenance to emergency repairs, we connect you with skilled professionals for every need.</p>
+            </div>
+            
+            <div class="services-grid">
+                {% for service in services %}
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="https://images.unsplash.com/photo-1600607688969-a5bfcd646154?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Plumbing service">
+                    </div>
+                    <div class="service-content">
+                        <span class="service-category">{{ service.name }}</span>
+                        <h3>Expert {{ service.name }} Solutions</h3>
+                        <p>{{ service.description }}</p>
+                        <div class="service-meta">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>(248)</span>
+                            </div>
+                            <div class="price">$65/hr</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Professionals -->
+    <section class="professionals" id="professionals">
+        <div class="container">
+            <div class="section-title">
+                <span class="subtitle">Our Professionals</span>
+                <h2>Meet Our Top Rated Experts</h2>
+                <p>Highly skilled and vetted professionals ready to deliver exceptional service.</p>
+            </div>
+            
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    <!-- Professional 1 -->
+                    {% for provider in four_providers %}
+                        <div class="swiper-slide">
+                            <div class="professional-card">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Johnson" class="professional-avatar">
+                                <div class="professional-content">
+                                    <h3>{{ provider.customer.user.username }}</h3>
+                                    <p> {{ provider.description|truncatewords:20 }}</p>
+                                    <div class="professional-skills">
+                                        {% for service_off in provider.services_offered.all %}
+                                            <span class="skill-tag">{{ service_off.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="professional-meta">
+                                        <div class="meta-item">
+                                            <h4>8.9</h4>
+                                            <p>Rating</p>
+                                        </div>
+                                        <div class="meta-item">
+                                            <h4>247</h4>
+                                            <p>Jobs</p>
+                                        </div>
+                                        <div class="meta-item">
+                                            <h4>{{provider.charge_per_hour}}</h4>
+                                            <p>Rate/Hour</p>
+                                        </div>
+                                        <div class="meta-item">
+                                            <h4>{{provider.experience}}</h4>
+                                            <p>Years</p>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'provider_detail' provider.id %}" class="btn btn-primary" style="width: 100%;">View Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <span class="subtitle">Process</span>
+                <h2>How EliteServe Works</h2>
+                <p>Simple steps to get quality service at your convenience.</p>
+            </div>
+            
+            <div class="steps-container">
+                <div class="steps-line"></div>
+                <div class="steps">
+                    <!-- Step 1 -->
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Describe Your Need</h3>
+                        <p>Tell us what service you require and provide any relevant details about the job.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Match With Pros</h3>
+                        <p>We'll connect you with qualified professionals available in your area.</p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Compare & Choose</h3>
+                        <p>Review profiles, ratings, and quotes to select the right professional.</p>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Enjoy Quality Service</h3>
+                        <p>Your pro arrives on time and completes the job to your satisfaction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <span class="subtitle">Testimonials</span>
+                <h2>What Our Clients Say</h2>
+                <p>Hear from homeowners and businesses who've used our platform.</p>
+            </div>
+            
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    <!-- Testimonial 1 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                "EliteServe saved me when my water heater burst on a holiday weekend. They had a plumber at my door within 2 hours who fixed everything professionally. The pricing was fair and transparent - no surprises."
+                            </div>
+                            <div class="testimonial-author">
+                                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Jennifer K." class="author-avatar">
+                                <div class="author-info">
+                                    <h4>Jennifer K.</h4>
+                                    <p>Homeowner, Chicago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 2 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                "As a small business owner, I rely on EliteServe for all our maintenance needs. Their professionals are consistently punctual, skilled, and professional. The booking platform makes managing service requests effortless."
+                            </div>
+                            <div class="testimonial-author">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Robert T." class="author-avatar">
+                                <div class="author-info">
+                                    <h4>Robert T.</h4>
+                                    <p>Business Owner, Miami</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 3 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                "I've used several platforms before, but EliteServe stands out for their quality of professionals. The electrician they sent was not only skilled but also took time to explain everything and gave me maintenance tips."
+                            </div>
+                            <div class="testimonial-author">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Amanda S." class="author-avatar">
+                                <div class="author-info">
+                                    <h4>Amanda S.</h4>
+                                    <p>Homeowner, Seattle</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container cta-container">
+            <h2>Ready to Experience Premium Service?</h2>
+            <p>Join thousands of satisfied customers who trust EliteServe for their home service needs.</p>
+            
+            <div class="cta-form">
+                <input type="email" placeholder="Enter your email address">
+                <button type="submit">Get Started <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Column 1 -->
+                <div class="footer-col">
+                    <a href="#" class="footer-logo">
+                        <i class="fas fa-hands-helping"></i>
+                        EliteServe
+                    </a>
+                    <div class="footer-about">
+                        <p>Connecting homeowners with top-quality service professionals for all home maintenance and improvement needs.</p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Column 2 -->
+                <div class="footer-col">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Plumbing</a></li>
+                        <li><a href="#">Electrical</a></li>
+                        <li><a href="#">HVAC</a></li>
+                        <li><a href="#">Cleaning</a></li>
+                        <li><a href="#">Handyman</a></li>
+                        <li><a href="#">View All</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div class="footer-col">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Service Ave, Suite 100, San Francisco, CA 94107</p>
+                        <p><i class="fas fa-phone-alt"></i> +1 (800) 123-4567</p>
+                        <p><i class="fas fa-envelope"></i> hello@eliteserve.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 EliteServe. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}

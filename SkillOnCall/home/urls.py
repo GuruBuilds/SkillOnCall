@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index, all_providers, provider_detail, explore_service, search
+from .views import index, all_providers, provider_detail, explore_service, search, newIndex  # Import the new view
 
 urlpatterns = [
     path('', index, name='index'),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('provider/<int:pk>/', provider_detail, name='provider_detail'),
     path('explore-service/<int:service_id>', explore_service, name='explore_service'),
     path('search', search, name='search'),
+    path('testing/', newIndex, name='newIndex'),  # New line added
 ]

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -61,7 +62,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'templates',  # Directory for custom templates
+            os.path.join(BASE_DIR, 'templates'),  # Directory for custom templates
         ],
         'APP_DIRS': True,
         'OPTIONS': {
