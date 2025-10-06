@@ -1,4 +1,4 @@
-// Mobile menu toggle
+        // Mobile menu toggle
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const navLinks = document.querySelector('.nav-links');
 const navButtons = document.querySelector('.nav-buttons');
@@ -141,3 +141,16 @@ document.querySelectorAll('.service-card, .step, .professional-card').forEach(el
 
 window.addEventListener('scroll', animateOnScroll);
 window.addEventListener('load', animateOnScroll);
+
+function toggleUserDropdown(e) {
+    e.preventDefault();
+    const menu = document.getElementById('userDropdownMenu');
+    menu.classList.toggle('show');
+
+    document.addEventListener('click', function handler(event) {
+        if (!event.target.closest('.dropdown')) {
+            menu.classList.remove('show');
+            document.removeEventListener('click', handler);
+        }
+    });
+}

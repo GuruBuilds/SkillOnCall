@@ -167,6 +167,11 @@ section {
     backdrop-filter: blur(10px);
 }
 
+.navbar.scrolled .nav-buttons .btn {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
 .navbar-container {
     display: flex;
     justify-content: space-between;
@@ -241,6 +246,107 @@ section {
 .nav-buttons .btn {
     margin-left: 1rem;
 }
+
+        /* User Dropdown (Navbar Profile) */
+.dropdown {
+    position: relative;
+}
+
+#userDropdown {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--white);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.navbar.scrolled #userDropdown {
+    color: var(--dark);
+}
+
+#userDropdown img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.navbar.scrolled #userDropdown img {
+    border-color: var(--primary-light);
+}
+
+#userDropdown:hover img {
+    transform: scale(1.05);
+}
+
+#userDropdown i {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+    transition: var(--transition);
+}
+
+#userDropdown:hover i {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+#userDropdownMenu {
+    position: absolute;
+    right: 0;
+    top: 120%;
+    background-color: var(--primary-dark);
+    color: var(--white);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: var(--transition);
+    list-style: none;
+}
+
+/* When dropdown is open (JS toggles .show class) */
+#userDropdownMenu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Dropdown items */
+#userDropdownMenu .dropdown-item {
+    color: var(--white);
+    display: block;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    font-size: 0.9375rem;
+    transition: var(--transition);
+}
+
+#userDropdownMenu .dropdown-item:hover {
+    background-color: var(--primary-light);
+    padding-left: 1.5rem;
+}
+
+#userDropdownMenu .dropdown-divider {
+    border-color: var(--primary-light);
+    margin: 0.5rem 0;
+}
+
+#userDropdownMenu .dropdown-item.text-danger {
+    color: var(--secondary);
+}
+
+#userDropdownMenu .dropdown-item.text-danger:hover {
+    background-color: rgba(255, 112, 67, 0.15);
+}
+
 
 .mobile-menu-btn {
     display: none;
